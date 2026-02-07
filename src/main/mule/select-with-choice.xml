@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="select-with-choiceFlow" doc:id="4c7767fe-5e72-46df-a3fd-3ce68d3c1d2c" >
+		<http:listener doc:name="Get Customer" doc:id="ce203c0d-7938-4d2e-83f0-939e65eecee8" config-ref="HTTP_Listener_config" path="/customer/credit"/>
+		<set-variable value="#[attributes.queryParams.creditLimit]" doc:name="Limit" doc:id="3d22372c-4142-4527-8957-22169725c8be" variableName="creditlist"/>
+		<choice doc:name="Choice" doc:id="e5280e9f-3ae0-4ac0-8bdd-2c0e2cfbfeb3" >
+			<when expression="#[attributes.queryParams.creditLimit == null]">
+				<flow-ref doc:name="db-connectFlow" doc:id="95a9350b-ce8f-4265-b380-a567ccdc4bf6" name="db-connectFlow"/>
+			</when>
+			<when expression="#[attributes.queryParams.creditLimit != null]">
+				<flow-ref doc:name="select-with-choiceFlow" doc:id="e0f84fa9-0884-4390-a244-eff8c7e72f75" name="selectflow_withcondition"/>
+			</when>
+			<otherwise >
+				<set-payload value="Invaild Request!" doc:name="Set Payload" doc:id="2bd0fbaa-a396-4fa1-adf7-05b6d317f8a2" />
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

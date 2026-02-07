@@ -1,0 +1,16 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd     http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+    <db:config name="DB_Config">
+        <db:my-sql-connection 
+            password="root" 
+            database="classicmodels" 
+            port="3306" 
+            host="localhost" 
+            user="root" >
+        </db:my-sql-connection>
+    </db:config>
+    <flow name="DBFlow">
+        <db:select doc:id="bekorv" doc:name="Select" config-ref="DB_Config">
+            <db:sql><![CDATA[SELECT * FROM classicmodels.customers;]]></db:sql>
+        </db:select>
+    </flow>
+</mule>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="MuleHttpFlow" doc:id="a2d7ff11-2284-415b-8612-0598e690a394" >
+		<http:listener doc:name="Http Flow" doc:id="3ac0a59b-4a26-4beb-98af-1d0e86ede0e6" config-ref="HTTP_Listener_config" path="/customers"/>
+		<flow-ref doc:name="db-connectFlow" doc:id="029df525-7f38-4492-a31c-5069764a6854" name="db-connectFlow"/>
+	</flow>
+	<flow name="db-connectFlow" doc:id="36560f4e-5204-46d0-a284-e89c0eeb2e35" >
+		<db:select doc:name="Get Customers" doc:id="9f1d488f-ef7d-460c-961a-cbd511f1f013" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM customers;]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="59643845-6708-4798-9a52-a0bb94208567" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="SelectFlowWithCondition" doc:id="db496825-7f89-4a6e-8d7a-6b4048aa5ee6" >
+		<http:listener doc:name="Select With Condition" doc:id="41f2522c-cf3e-4d0d-a350-01fc4c367749" config-ref="HTTP_Listener_config" path="/customer-creditlimit"/>
+		<set-variable value="#[attributes.queryParams.creditLimit]" doc:name="Credit List" doc:id="9771a788-7728-411e-af84-e9749c237056" variableName="creditlist"/>
+		<flow-ref doc:name="selectflow_withcondition" doc:id="e707a32f-4db6-4508-b9b4-b780b46dca36" name="selectflow_withcondition"/>
+	</flow>
+	<flow name="selectflow_withcondition" doc:id="4122116e-5418-4e11-b44d-e7769ed5b81c" >
+		<db:select doc:name="SelectWithCondition" doc:id="acdac323-d795-4ddd-84a8-54d83af2fc61" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM customers WHERE creditLimit > :cl;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	cl: vars.creditlist as Number default 10
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="a4cb611a-58c2-4a2c-9fde-9204044b2825" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

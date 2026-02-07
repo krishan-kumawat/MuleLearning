@@ -53,3 +53,5 @@ node_modules/
 *.yaml
 *.yml
 *.secure.properties
+
+.tooling-project

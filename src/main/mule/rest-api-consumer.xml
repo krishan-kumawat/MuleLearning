@@ -1,0 +1,52 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd  http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <flow name="MuleEmpRecords">
+        <http:listener allowedMethods="GET" config-ref="Univ_Listener_Config" doc:id="liugcg" doc:name="Employee Listner" path="/mule-products"></http:listener>
+        <flow-ref doc:name="Flow-ref" name="GetEmployeeDetails"></flow-ref>
+    </flow>
+    <flow name="GetEmployeeDetails">
+        <http:request config-ref="RESTRequestConfigs" doc:id="vmbijw" doc:name="Request for Emp records" path="/products"></http:request>
+        <ee:transform doc:id="xedyld" doc:name="Transform">
+            <ee:message>
+                <ee:set-payload doc:id="kbnpif" doc:name="Set payload"><![CDATA[%dw 2.0
+        output application/json
+        ---
+       products: {
+          (payload)
+        }]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="GetEMPRecord">
+        <http:request config-ref="RESTRequestConfigs" doc:id="tjdjtl" doc:name="Request" path="product/{id}">
+            <http:uri-params><![CDATA[#[output application/java
+---
+{
+	id : attributes.uriParams.employeeId
+}]]]></http:uri-params>
+        </http:request>
+    </flow>
+    <flow name="MuleEmpRecord">
+        <http:listener allowedMethods="GET" config-ref="Univ_Listener_Config" doc:id="lohidx" doc:name="Listener" path="/mule-product/{employeeId}"></http:listener>
+        <flow-ref doc:name="Flow-ref" name="GetEMPRecord"></flow-ref>
+    </flow>
+    <flow name="ConditionalFlow">
+        <http:listener config-ref="Univ_Listener_Config" doc:id="zwfrtw" doc:name="Listener" path="/mule-choice"></http:listener>
+        <choice doc:id="bvaolx" doc:name="Choose Recrod Type">
+            <when doc:name="When" expression="#[attributes.method == 'GET' and attributes.queryParams.rectype == 'all']">
+                <flow-ref doc:name="EMP Records" name="GetEmployeeDetails"></flow-ref>
+            </when>
+            <when doc:name="When" expression="#[attributes.method == 'GET' and attributes.queryParams.rectype == 'empId']">
+                <flow-ref doc:name="Emp Records" name="ConditionalFlow:Record"></flow-ref>
+            </when>
+            <otherwise>
+                <set-payload doc:id="mwuhol" doc:name="Set payload" value="'Invaild Request'"></set-payload>
+            </otherwise>
+        </choice>
+    </flow>
+    <flow name="ConditionalFlow:Record">
+        <http:request doc:name="Request" doc:id="nobwvj" path="products/{id}" config-ref="RESTRequestConfigs">
+            <http:uri-params><![CDATA[#[{
+  id: attributes.queryParams.Id
+}]]]></http:uri-params>
+        </http:request></flow>
+</mule>
