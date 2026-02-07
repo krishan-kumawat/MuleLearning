@@ -1,0 +1,55 @@
+# =========================
+# Mule / Maven
+# =========================
+/target/
+*.log
+*.tmp
+*.bak
+
+# Mule runtime / local config
+.mule/
+.mule/
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+.history/
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Maven
+# =========================
+.mvn/
+dependency-reduced-pom.xml
+
+# =========================
+# Eclipse / Anypoint Studio
+# =========================
+.project
+.classpath
+.settings/
+
+# =========================
+# IntelliJ
+# =========================
+.idea/
+*.iml
+
+# =========================
+# Node / UI (if any)
+# =========================
+node_modules/
+
+# =========================
+# Secrets (VERY IMPORTANT)
+# =========================
+*.properties
+*.yaml
+*.yml
+*.secure.properties
